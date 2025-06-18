@@ -169,3 +169,86 @@ System.cmd(
 )
 |> KinoGuide.RacketCell.format_output()
 ```
+
+Exercise 1.4
+
+<!-- livebook:{"attrs":"eyJzb3VyY2UiOiIoZGVmaW5lIChhLXBsdXMtYWJzLWIgYSBiKVxuIChjb25kIFsoPiBiIDApICgrIGEgYildIFtlbHNlICgtIGEgYildKVxuKVxuXG4oYS1wbHVzLWFicy1iIDEgMylcbihhLXBsdXMtYWJzLWIgMSAtMykifQ","chunks":null,"kind":"Elixir.KinoGuide.RacketCell","livebook_object":"smart_cell"} -->
+
+```elixir
+System.cmd(
+  "racket",
+  [
+    "-e",
+    "(define (a-plus-abs-b a b)\n (cond [(> b 0) (+ a b)] [else (- a b)])\n)\n\n(a-plus-abs-b 1 3)\n(a-plus-abs-b 1 -3)"
+  ],
+  stderr_to_stdout: true
+)
+|> KinoGuide.RacketCell.format_output()
+```
+
+Exercise 1.5
+
+___
+
+```racket
+(define (p) (p))
+(define (test x y) (if (= x 0) 0 y))
+(test 0 (p))
+```
+
+* *p* is a function that returns itself recursively
+* when *p* is evaluated it will go into an infinite loop
+* *test* is a function that returns 0 if `x == 0`
+
+Assuming evaluation rule for special form `if` checks left hand side first without evaluating the right - it would return zero. Otherwise, *p* would recur to infinite depth and cause a stack overflow.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Exercise 1.6
+
+___
+
+Alyssa's program
+
+```racket
+(define (new-if predicate 
+                then-clause 
+                else-clause)
+  (cond (predicate then-clause)
+        (else else-clause)))
+(new-if (= 2 3) 0 5) ; 5
+(new-if (= 1 1) 0 5) ; 0
+```
+
+She writes `sqrt-iter` as
+
+```racket
+(define (sqrt-iter guess x)
+  (new-if (good-enough? guess x)
+          guess
+          (sqrt-iter (improve guess x) x)))
+```
+
+What will happen is once the guess gets within `1e-2` of X then guess will be returned. Otherwise `improve` gets applied to guess until the value gets close enough to x.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Exercise 1.7
+
+___
+
+Show how the test can fail for very small & very large
+
+<!-- livebook:{"attrs":"eyJzb3VyY2UiOiIoZGVmaW5lIChhdmVyYWdlIHggeSkgKC8gKCsgeCB5KSAyKSlcbihkZWZpbmUgKGltcHJvdmUgZ3Vlc3MgeCkgKGF2ZXJhZ2UgZ3Vlc3MgKC8geCBndWVzcykpKVxuKGRlZmluZSAoc3F1YXJlIHgpICgqIHggeCkpXG4oZGVmaW5lIChnb29kLWVub3VnaD8gZ3Vlc3MgeCkgKDwgKGFicyAoLSAoc3F1YXJlIGd1ZXNzKSB4KSkgMC4wMDEpKVxuKGRlZmluZSAoc3FydC1pdGVyIGd1ZXNzIHgpIChpZiAoZ29vZC1lbm91Z2g/IGd1ZXNzIHgpIGd1ZXNzIChzcXJ0LWl0ZXIgKGltcHJvdmUgZ3Vlc3MgeCkgeCkgKSApXG4oZGVmaW5lIChzcXJ0IHgpIChzcXJ0LWl0ZXIgMS4wIHgpKVxuXG4od3JpdGVsbiAobGlzdCBcInN0YXJ0XCIgOSBcImV4cGVjdHNcIiAzIFwic3FydFwiIChzcXJ0IDkpIFwic3FydCAuIHNxXCIgKHNxdWFyZSAoc3FydCA5KSkgKSlcbih3cml0ZWxuIChsaXN0IFwic3RhcnRcIiA0IFwiZXhwZWN0c1wiIDIgXCJzcXJ0XCIgKHNxcnQgNCkgXCJzcXJ0IC4gc3FcIiAoc3F1YXJlIChzcXJ0IDQpKSApKVxuKHdyaXRlbG4gKGxpc3QgXCJzdGFydFwiIDEwMCBcImV4cGVjdHNcIiAxMCBcInNxcnRcIiAoc3FydCAxMDApIFwic3FydCAuIHNxXCIgKHNxdWFyZSAoc3FydCAxMDApKSApKSJ9","chunks":null,"kind":"Elixir.KinoGuide.RacketCell","livebook_object":"smart_cell"} -->
+
+```elixir
+System.cmd(
+  "racket",
+  [
+    "-e",
+    "(define (average x y) (/ (+ x y) 2))\n(define (improve guess x) (average guess (/ x guess)))\n(define (square x) (* x x))\n(define (good-enough? guess x) (< (abs (- (square guess) x)) 0.001))\n(define (sqrt-iter guess x) (if (good-enough? guess x) guess (sqrt-iter (improve guess x) x) ) )\n(define (sqrt x) (sqrt-iter 1.0 x))\n\n(writeln (list \"start\" 9 \"expects\" 3 \"sqrt\" (sqrt 9) \"sqrt . sq\" (square (sqrt 9)) ))\n(writeln (list \"start\" 4 \"expects\" 2 \"sqrt\" (sqrt 4) \"sqrt . sq\" (square (sqrt 4)) ))\n(writeln (list \"start\" 100 \"expects\" 10 \"sqrt\" (sqrt 100) \"sqrt . sq\" (square (sqrt 100)) ))"
+  ],
+  stderr_to_stdout: true
+)
+|> KinoGuide.RacketCell.format_output()
+```
