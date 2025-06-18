@@ -41,9 +41,7 @@ defmodule KinoGuide.RacketCell do
   """
   def format_output({output, 0}) do
     Kino.Markdown.new("""
-    ## ✅ Racket Execution Success
-
-    ```
+    ```bash
     #{String.trim(output)}
     ```
     """)
@@ -53,7 +51,7 @@ defmodule KinoGuide.RacketCell do
     Kino.Markdown.new("""
     ## ❌ Racket Execution Error (Exit Code: #{status})
 
-    ```
+    ```bash
     #{String.trim(output)}
     ```
     """)
@@ -211,8 +209,8 @@ ___
 Alyssa's program
 
 ```racket
-(define (new-if predicate 
-                then-clause 
+(define (new-if predicate
+                then-clause
                 else-clause)
   (cond (predicate then-clause)
         (else else-clause)))
