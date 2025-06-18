@@ -229,7 +229,7 @@ She writes `sqrt-iter` as
           (sqrt-iter (improve guess x) x)))
 ```
 
-What will happen is once the guess gets within `1e-2` of X then guess will be returned. Otherwise `improve` gets applied to guess until the value gets close enough to x.
+Since we now use cond the else clause would get evaluated each time the function is called and get stuck in infinite recursion. The previous `if` only worked becuase LHS checks happens first.
 
 <!-- livebook:{"break_markdown":true} -->
 
@@ -239,14 +239,73 @@ ___
 
 Show how the test can fail for very small & very large
 
-<!-- livebook:{"attrs":"eyJzb3VyY2UiOiIoZGVmaW5lIChhdmVyYWdlIHggeSkgKC8gKCsgeCB5KSAyKSlcbihkZWZpbmUgKGltcHJvdmUgZ3Vlc3MgeCkgKGF2ZXJhZ2UgZ3Vlc3MgKC8geCBndWVzcykpKVxuKGRlZmluZSAoc3F1YXJlIHgpICgqIHggeCkpXG4oZGVmaW5lIChnb29kLWVub3VnaD8gZ3Vlc3MgeCkgKDwgKGFicyAoLSAoc3F1YXJlIGd1ZXNzKSB4KSkgMC4wMDEpKVxuKGRlZmluZSAoc3FydC1pdGVyIGd1ZXNzIHgpIChpZiAoZ29vZC1lbm91Z2g/IGd1ZXNzIHgpIGd1ZXNzIChzcXJ0LWl0ZXIgKGltcHJvdmUgZ3Vlc3MgeCkgeCkgKSApXG4oZGVmaW5lIChzcXJ0IHgpIChzcXJ0LWl0ZXIgMS4wIHgpKVxuXG4od3JpdGVsbiAobGlzdCBcInN0YXJ0XCIgOSBcImV4cGVjdHNcIiAzIFwic3FydFwiIChzcXJ0IDkpIFwic3FydCAuIHNxXCIgKHNxdWFyZSAoc3FydCA5KSkgKSlcbih3cml0ZWxuIChsaXN0IFwic3RhcnRcIiA0IFwiZXhwZWN0c1wiIDIgXCJzcXJ0XCIgKHNxcnQgNCkgXCJzcXJ0IC4gc3FcIiAoc3F1YXJlIChzcXJ0IDQpKSApKVxuKHdyaXRlbG4gKGxpc3QgXCJzdGFydFwiIDEwMCBcImV4cGVjdHNcIiAxMCBcInNxcnRcIiAoc3FydCAxMDApIFwic3FydCAuIHNxXCIgKHNxdWFyZSAoc3FydCAxMDApKSApKSJ9","chunks":null,"kind":"Elixir.KinoGuide.RacketCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":"eyJzb3VyY2UiOiIoZGVmaW5lIChhdmVyYWdlIHggeSkgKC8gKCsgeCB5KSAyKSlcbihkZWZpbmUgKGltcHJvdmUgZ3Vlc3MgeCkgKGF2ZXJhZ2UgZ3Vlc3MgKC8geCBndWVzcykpKVxuKGRlZmluZSAoc3F1YXJlIHgpICgqIHggeCkpXG4oZGVmaW5lIChnb29kLWVub3VnaD8gZ3Vlc3MgeCkgKDwgKGFicyAoLSAoc3F1YXJlIGd1ZXNzKSB4KSkgMC4wMDEpKVxuKGRlZmluZSAoc3FydC1pdGVyIGd1ZXNzIHgpIChpZiAoZ29vZC1lbm91Z2g/IGd1ZXNzIHgpIGd1ZXNzIChzcXJ0LWl0ZXIgKGltcHJvdmUgZ3Vlc3MgeCkgeCkgKSApXG4oZGVmaW5lIChzcXJ0IHgpIChzcXJ0LWl0ZXIgMS4wIHgpKVxuXG47IENsb3NlIEVub3VnaCBva1xuKHdyaXRlbG4gKGxpc3QgXCJzdGFydFwiIDkgXCJleHBlY3RzXCIgMyBcInNxcnRcIiAoc3FydCA5KSBcInNxcnQgLiBzcVwiIChzcXVhcmUgKHNxcnQgOSkpICkpXG4od3JpdGVsbiAobGlzdCBcInN0YXJ0XCIgNCBcImV4cGVjdHNcIiAyIFwic3FydFwiIChzcXJ0IDQpIFwic3FydCAuIHNxXCIgKHNxdWFyZSAoc3FydCA0KSkgKSlcbih3cml0ZWxuIChsaXN0IFwic3RhcnRcIiAxMDAgXCJleHBlY3RzXCIgMTAgXCJzcXJ0XCIgKHNxcnQgMTAwKSBcInNxcnQgLiBzcVwiIChzcXVhcmUgKHNxcnQgMTAwKSkgKSlcblxuOyBJc3N1ZXNcbjsgKHNxcnQgMWUxNCk7IHNob3VsZCBiZSAxZTdcbjsgKHNxcnQgMWUyMSkgOyBvb3BzISB0aGUgZ29vZCBlbm91Z2ggZ3Vlc3MgaXMgYWx3YXlzIHRvbyBsYXJnZSBcbihzcXJ0IDFlLTEwKSA7IHNob3VsZCBiZSAxZS01XG4oc3FydCAxZS0yMCkgOyBzaG91bGQgYmUgMWUtMTAifQ","chunks":null,"kind":"Elixir.KinoGuide.RacketCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 System.cmd(
   "racket",
   [
     "-e",
-    "(define (average x y) (/ (+ x y) 2))\n(define (improve guess x) (average guess (/ x guess)))\n(define (square x) (* x x))\n(define (good-enough? guess x) (< (abs (- (square guess) x)) 0.001))\n(define (sqrt-iter guess x) (if (good-enough? guess x) guess (sqrt-iter (improve guess x) x) ) )\n(define (sqrt x) (sqrt-iter 1.0 x))\n\n(writeln (list \"start\" 9 \"expects\" 3 \"sqrt\" (sqrt 9) \"sqrt . sq\" (square (sqrt 9)) ))\n(writeln (list \"start\" 4 \"expects\" 2 \"sqrt\" (sqrt 4) \"sqrt . sq\" (square (sqrt 4)) ))\n(writeln (list \"start\" 100 \"expects\" 10 \"sqrt\" (sqrt 100) \"sqrt . sq\" (square (sqrt 100)) ))"
+    "(define (average x y) (/ (+ x y) 2))\n(define (improve guess x) (average guess (/ x guess)))\n(define (square x) (* x x))\n(define (good-enough? guess x) (< (abs (- (square guess) x)) 0.001))\n(define (sqrt-iter guess x) (if (good-enough? guess x) guess (sqrt-iter (improve guess x) x) ) )\n(define (sqrt x) (sqrt-iter 1.0 x))\n\n; Close Enough ok\n(writeln (list \"start\" 9 \"expects\" 3 \"sqrt\" (sqrt 9) \"sqrt . sq\" (square (sqrt 9)) ))\n(writeln (list \"start\" 4 \"expects\" 2 \"sqrt\" (sqrt 4) \"sqrt . sq\" (square (sqrt 4)) ))\n(writeln (list \"start\" 100 \"expects\" 10 \"sqrt\" (sqrt 100) \"sqrt . sq\" (square (sqrt 100)) ))\n\n; Issues\n; (sqrt 1e14); should be 1e7\n; (sqrt 1e21) ; oops! the good enough guess is always too large \n(sqrt 1e-10) ; should be 1e-5\n(sqrt 1e-20) ; should be 1e-10"
+  ],
+  stderr_to_stdout: true
+)
+|> KinoGuide.RacketCell.format_output()
+```
+
+Results when *N* gets smaller than our fixed `1e-2` it returns an approximation of `1e-2` instead of our *N*.
+
+<!-- livebook:{"attrs":"eyJzb3VyY2UiOiIoZGVmaW5lIChhdmVyYWdlIHggeSkgKC8gKCsgeCB5KSAyKSlcbihkZWZpbmUgKGltcHJvdmUgZ3Vlc3MgeCkgKGF2ZXJhZ2UgZ3Vlc3MgKC8geCBndWVzcykpKVxuKGRlZmluZSAoc3F1YXJlIHgpICgqIHggeCkpXG4oZGVmaW5lIChzcXJ0IHgpIChzcXJ0LWl0ZXIgMS4wIHgpKVxuXG4oZGVmaW5lIChnb29kLWVub3VnaD8gZzEgZzIpXHJcbiAgKG9yICh6ZXJvPyBnMilcclxuICAgICAgKDwgKC8gKGFicyAoLSBnMiBnMSkpIGcxKVxyXG4gICAgICAgICAwLjAwMSkpKVxyXG4oZGVmaW5lIChzcXJ0LWl0ZXIgZ3Vlc3MgeClcclxuICAobGV0ICgoYmV0dGVyIChpbXByb3ZlIGd1ZXNzIHgpKSlcclxuICAgIChpZiAoZ29vZC1lbm91Z2g/IGd1ZXNzIGJldHRlcilcclxuICAgICAgICBndWVzc1xyXG4gICAgICAgIChzcXJ0LWl0ZXIgYmV0dGVyIHgpKSkpXHJcblxuKHNxcnQgOSlcbihzcXJ0IDFlLTEpXG4oc3FydCAxZS0yKVxuKHNxcnQgMWUtMylcbihzcXJ0IDFlLTEwKSJ9","chunks":null,"kind":"Elixir.KinoGuide.RacketCell","livebook_object":"smart_cell"} -->
+
+```elixir
+System.cmd(
+  "racket",
+  [
+    "-e",
+    "(define (average x y) (/ (+ x y) 2))\n(define (improve guess x) (average guess (/ x guess)))\n(define (square x) (* x x))\n(define (sqrt x) (sqrt-iter 1.0 x))\n\n(define (good-enough? g1 g2)\r\n  (or (zero? g2)\r\n      (< (/ (abs (- g2 g1)) g1)\r\n         0.001)))\r\n(define (sqrt-iter guess x)\r\n  (let ((better (improve guess x)))\r\n    (if (good-enough? guess better)\r\n        guess\r\n        (sqrt-iter better x))))\r\n\n(sqrt 9)\n(sqrt 1e-1)\n(sqrt 1e-2)\n(sqrt 1e-3)\n(sqrt 1e-10)"
+  ],
+  stderr_to_stdout: true
+)
+|> KinoGuide.RacketCell.format_output()
+```
+
+Instead of checking the precision of guess we check for the magnitude of precision based on the input value. This is equivalent to 0.1% of X
+
+| expr           | precision    | within | comments   |
+| -------------- | ------------ | ------ | ---------- |
+| sqrt(1e6)      | 0.001        | 0.001  | too strict |
+| new-sqrt(1e6)  | 1000 * 0.001 | 1.0    | ok         |
+| sqrt(1e6)      | 0.001        | 0.001  | too loose  |
+| new-sqrt(1e-4) | 1e-2 * 0.001 | 1e-4   | ok         |
+
+<!-- livebook:{"break_markdown":true} -->
+
+Exercise 1.8
+
+___
+
+if y is approx cube root of x
+
+(x/y^2) + 2y / 3 = z
+
+(x/y^2) + 2y = 3z
+
+x(y^2) + 2(y^3) = 3z(y^2)
+
+x(y^2) + 2(y^3) - 3z(y^2) = 0
+
+x + 2y - 3z = 0
+
+x = 3z - 2y
+
+<!-- livebook:{"attrs":"eyJzb3VyY2UiOiI7IGRlZmluZSBuZXd0b24ncyBtZXRob2QgZm9yIGN1YmUgcm9vdFxuKGRlZmluZSAoYXZlcmFnZSB4IHkpICgvICgrIHggeSkgMikpXG4oZGVmaW5lIChpbXByb3ZlIGd1ZXNzIHgpIChhdmVyYWdlIGd1ZXNzICgvIHggZ3Vlc3MpKSlcbihkZWZpbmUgKHNxdWFyZSB4KSAoKiB4IHgpKVxuKGRlZmluZSAoZ29vZC1lbm91Z2g/IGd1ZXNzIHgpICg8IChhYnMgKC0gKHNxdWFyZSBndWVzcykgeCkpIDAuMDAxKSlcbihkZWZpbmUgKHNxcnQtaXRlciBndWVzcyB4KSAoaWYgKGdvb2QtZW5vdWdoPyBndWVzcyB4KSBndWVzcyAoc3FydC1pdGVyIChpbXByb3ZlIGd1ZXNzIHgpIHgpICkgKVxuKGRlZmluZSAoc3FydCB4KSAoc3FydC1pdGVyIDEuMCB4KSlcblxuKGRlZmluZSAoY3ViZS1yb290IGFwcHJveCBudW0pXG4gICgvICgrICgvIG51bSAoKiBhcHByb3ggYXBwcm94KSkgKCogMiBhcHByb3gpICkgMylcbilcblxuKGN1YmUtcm9vdCAzLjAwMDAwMSAyNykifQ","chunks":null,"kind":"Elixir.KinoGuide.RacketCell","livebook_object":"smart_cell"} -->
+
+```elixir
+System.cmd(
+  "racket",
+  [
+    "-e",
+    "; define newton's method for cube root\n(define (average x y) (/ (+ x y) 2))\n(define (improve guess x) (average guess (/ x guess)))\n(define (square x) (* x x))\n(define (good-enough? guess x) (< (abs (- (square guess) x)) 0.001))\n(define (sqrt-iter guess x) (if (good-enough? guess x) guess (sqrt-iter (improve guess x) x) ) )\n(define (sqrt x) (sqrt-iter 1.0 x))\n\n(define (cube-root approx num)\n  (/ (+ (/ num (* approx approx)) (* 2 approx) ) 3)\n)\n\n(cube-root 3.000001 27)"
   ],
   stderr_to_stdout: true
 )
