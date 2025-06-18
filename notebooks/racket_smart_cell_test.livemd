@@ -1,0 +1,62 @@
+# Racket Smart Cell Test
+
+## Section
+
+This notebook demonstrates the custom Racket smart cell.
+
+## Testing Basic Racket Code
+
+Let's test some simple Racket expressions:
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.12.0"}
+])
+# Load the Racket Smart Cell
+Application.ensure_all_started(:racket_smart_cell)
+Kino.SmartCell.register(RacketSmartCell)
+"Racket Smart Cell loaded!"
+```
+
+<!-- livebook:{"attrs":"eyJjb2RlIjoiKCsgMSAyIDMpIn0","chunks":null,"kind":"Elixir.RacketSmartCell","livebook_object":"smart_cell"} -->
+
+```elixir
+{output, exit_code} = System.cmd("racket", ["-e", "(+ 1 2 3)"], stderr_to_stdout: true)
+
+if exit_code == 0 do
+  IO.puts(output)
+else
+  IO.puts("Error (exit code #{exit_code}):")
+  IO.puts(output)
+end
+```
+
+## Testing List Operations
+
+<!-- livebook:{"attrs":"eyJjb2RlIjoiKGRlZmluZSBsc3QgJygxIDIgMyA0IDUpKVxuKG1hcCAobGFtYmRhICh4KSAoKiB4IHgpKSBsc3QpIn0","chunks":null,"kind":"Elixir.RacketSmartCell","livebook_object":"smart_cell"} -->
+
+```elixir
+{output, exit_code} = System.cmd("racket", ["-e", "(define lst '(1 2 3 4 5))\n(map (lambda (x) (* x x)) lst)"], stderr_to_stdout: true)
+
+if exit_code == 0 do
+  IO.puts(output)
+else
+  IO.puts("Error (exit code #{exit_code}):")
+  IO.puts(output)
+end
+```
+
+## Testing SICP Exercise
+
+<!-- livebook:{"attrs":"eyJjb2RlIjoiKGRlZmluZSAoc3F1YXJlIHgpICgqIHggeCkpXG4oZGVmaW5lIChzdW0tb2Ytc3F1YXJlcyB4IHkpXG4gICgrIChzcXVhcmUgeCkgKHNxdWFyZSB5KSkpXG4oc3VtLW9mLXNxdWFyZXMgMyA0KSJ9","chunks":null,"kind":"Elixir.RacketSmartCell","livebook_object":"smart_cell"} -->
+
+```elixir
+{output, exit_code} = System.cmd("racket", ["-e", "(define (square x) (* x x))\n(define (sum-of-squares x y)\n  (+ (square x) (square y)))\n(sum-of-squares 3 4)"], stderr_to_stdout: true)
+
+if exit_code == 0 do
+  IO.puts(output)
+else
+  IO.puts("Error (exit code #{exit_code}):")
+  IO.puts(output)
+end
+```
