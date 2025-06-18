@@ -32,42 +32,53 @@ defmodule KinoGuide.RacketCell do
     %{"source" => ctx.assigns.source}
   end
 
-@impl true
-def to_source(attrs) do
-  quote do
-    case System.cmd(
-           "racket",
-           ["-e", unquote(attrs["source"])],
-           stderr_to_stdout: true
-         ) do
-      {output, 0} ->
-        Kino.Markdown.new("""
-        ## ✅ Racket Execution Success
+  @doc """
+  Formats the output from System.cmd for Racket execution results.
 
-        ```
-        #{String.trim(output)}
-        ```
-        """)
+  ## Parameters
+  - `{output, exit_code}` when exit_code is an integer
+  - `error` for any other case
+  """
+  def format_output({output, 0}) do
+    Kino.Markdown.new("""
+    ## ✅ Racket Execution Success
 
-      {output, status} when is_integer(status) ->
-        Kino.Markdown.new("""
-        ## ❌ Racket Execution Error (Exit Code: #{status})
-
-        ```
-        #{String.trim(output)}
-        ```
-        """)
-
-      error ->
-        Kino.Markdown.new("""
-        ## ❌ System Error
-
-        Failed to execute racket command: `#{inspect(error)}`
-        """)
-    end
+    ```
+    #{String.trim(output)}
+    ```
+    """)
   end
-  |> Kino.SmartCell.quoted_to_string()
-end
+
+  def format_output({output, status}) when is_integer(status) do
+    Kino.Markdown.new("""
+    ## ❌ Racket Execution Error (Exit Code: #{status})
+
+    ```
+    #{String.trim(output)}
+    ```
+    """)
+  end
+
+  def format_output(error) do
+    Kino.Markdown.new("""
+    ## ❌ System Error
+
+    Failed to execute racket command: `#{inspect(error)}`
+    """)
+  end
+
+  @impl true
+  def to_source(attrs) do
+    quote do
+      System.cmd(
+        "racket",
+        ["-e", unquote(attrs["source"])],
+        stderr_to_stdout: true
+      )
+      |> KinoGuide.RacketCell.format_output()
+    end
+    |> Kino.SmartCell.quoted_to_string()
+  end
 
   asset "main.js" do
     """
@@ -96,38 +107,16 @@ end
 end
 
 Kino.SmartCell.register(KinoGuide.RacketCell)
-
 ````
 
 ## Section
 
 <!-- livebook:{"attrs":"eyJzb3VyY2UiOiIoKyAxIDIpXG4oKyAzIDQpIn0","chunks":null,"kind":"Elixir.KinoGuide.RacketCell","livebook_object":"smart_cell"} -->
 
-````elixir
-case System.cmd("racket", ["-e", "(+ 1 2)\n(+ 3 4)"], stderr_to_stdout: true) do
-  {output, 0} ->
-    Kino.Markdown.new("## ✅ Racket Execution Success
-
+```elixir
+System.cmd("racket", ["-e", "(+ 1 2)\n(+ 3 4)"], stderr_to_stdout: true)
+|> KinoGuide.RacketCell.format_output()
 ```
-#{String.trim(output)}
-```
-")
-
-  {output, status} when is_integer(status) ->
-    Kino.Markdown.new("## ❌ Racket Execution Error (Exit Code: #{status})
-
-```
-#{String.trim(output)}
-```
-")
-
-  error ->
-    Kino.Markdown.new("## ❌ System Error
-
-Failed to execute racket command: `#{inspect(error)}`
-")
-end
-````
 
 ```elixir
 System.cmd("racket", ["--version"])
