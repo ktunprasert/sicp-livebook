@@ -41,7 +41,7 @@ defmodule KinoGuide.RacketCell do
   """
   def format_output({output, 0}) do
     Kino.Markdown.new("""
-    ```bash
+    ```elixir
     #{String.trim(output)}
     ```
     """)
@@ -51,8 +51,8 @@ defmodule KinoGuide.RacketCell do
     Kino.Markdown.new("""
     ## ❌ Racket Execution Error (Exit Code: #{status})
 
-    ```bash
-    #{String.trim(output)}
+    ```elixir
+    "#{String.trim(output)}"
     ```
     """)
   end
