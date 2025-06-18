@@ -1,0 +1,33 @@
+FROM ghcr.io/livebook-dev/livebook:latest
+
+USER root
+
+# Install dependencies for Racket
+RUN apt-get update && \
+    apt-get install -y wget ca-certificates && \
+    apt-get clean
+
+# Download and install Racket 8.17
+RUN wget https://download.racket-lang.org/installers/8.17/racket-8.17-x86_64-linux-cs.sh && \
+    chmod +x racket-8.17-x86_64-linux-cs.sh && \
+    ./racket-8.17-x86_64-linux-cs.sh --in-place --dest /opt/racket && \
+    rm racket-8.17-x86_64-linux-cs.sh
+
+# Add Racket to PATH
+ENV PATH="/opt/racket/bin:${PATH}"
+
+# Verify installation
+RUN racket --version
+
+# Switch back to livebook user
+# USER livebook
+
+# Set working directory
+WORKDIR /data
+
+# Expose Livebook port
+EXPOSE 8080
+
+# Use the same entrypoint as the base Livebook image
+ENTRYPOINT ["/app/bin/livebook"]
+CMD ["start"]

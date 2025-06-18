@@ -1,0 +1,29 @@
+services:
+  livebook-racket:
+    build:
+      context: .
+      dockerfile: Dockerfile.livebook-racket
+    container_name: racket-livebook
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - LIVEBOOK_PASSWORD=7fc01ea6-2b13-43f7-ac1d-b709b2b7e3d4
+      - LIVEBOOK_HOME=/data
+      - LIVEBOOK_DATA_PATH=/data
+      - LIVEBOOK_APPS_PATH=/apps
+    volumes:
+      # Mount notebooks directory
+      - ./notebooks:/data/notebooks
+      # Mount custom smart cells
+      - ./smart_cells:/apps/smart_cells
+      # Mount Racket files/exercises
+      - ./racket_files:/data/racket_files
+      # Mount configuration
+      - ./config:/data/config
+      # Persistent data
+      - livebook_data:/data
+    # restart: unless-stopped
+
+volumes:
+  livebook_data:
